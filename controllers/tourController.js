@@ -5,7 +5,7 @@ export const getAllTours = async (req, res) => {
     const tours = await Tour.find({});
     res.status(200).json({ tours });
   } catch (error) {
-    res.status(500).send("something is wrong ");
+    res.status(500).send(error);
   }
 };
 
@@ -14,6 +14,9 @@ export const createTour = async (req, res) => {
     const tour = await Tour.create(req.body);
     res.status(201).json({ tour });
   } catch (error) {
-    res.status(500).send("something is wrong ");
+    res.status(400).json({
+      status: "fail",
+      message: error,
+    });
   }
 };
