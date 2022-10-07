@@ -8,7 +8,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       unique: true,
       maxlength: [40, "A tour name must have less or equal then 40 characters"],
-        },
+    },
 
     summary: {
       type: String,
@@ -57,8 +57,9 @@ const tourSchema = new mongoose.Schema(
 
     images: [String],
 
-    ratingAverage: {
+    ratingsAverage: {
       type: Number,
+      default: 4.9,
     },
 
     ratingsQuantity: {
@@ -67,7 +68,6 @@ const tourSchema = new mongoose.Schema(
     },
 
     startDates: [Date],
-   
   },
   { timestamps: true }
 );
