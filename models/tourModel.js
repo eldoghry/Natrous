@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const tourSchema = new mongoose.Schema(
   {
@@ -68,8 +69,20 @@ const tourSchema = new mongoose.Schema(
     },
 
     startDates: [Date],
+
+    slug: String,
   },
   { timestamps: true }
 );
+
+//Model Middleware
+tourSchema.pre("save", function (next) {
+  //this is created doc
+  //create slug for document
+
+  this.slug = slugify(this.name);
+
+  next();
+});
 
 export default mongoose.model("Tour", tourSchema);

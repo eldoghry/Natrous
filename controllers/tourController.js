@@ -1,12 +1,8 @@
 import APIFeatures from "../utils/apiFeatures.js";
 import Tour from "./../models/tourModel.js";
 
-
-
 export const getAllTours = async (req, res) => {
   try {
-    // 1) filtering
-
     const apiFeatures = new APIFeatures(Tour.find(), req.query)
       .filter()
       .limitFields()
