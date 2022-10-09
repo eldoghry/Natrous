@@ -49,13 +49,9 @@ export default class APIFeatures {
 
   paginate() {
     //limit = 10 page 1 : [1 - 10], page 2 : [11 - 20], page 3 : [21 - 30]
-
-    if (this.queryStr.page) {
-      const limit = +this.queryStr.limit || 10;
-      const page = +this.queryStr.page || 1;
-
-      this.query = this.query.skip((page - 1) * limit).limit(limit);
-    }
+    const limit = +this.queryStr.limit || 10;
+    const page = +this.queryStr.page || 1;
+    this.query = this.query.skip((page - 1) * limit).limit(limit);
 
     return this;
   }

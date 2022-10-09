@@ -5,6 +5,13 @@ import checkBody from "../middlewares/checkBody.js";
 const router = express.Router();
 
 router
+  .route("/top-cheap-tours")
+  .get(tourController.aliasTopTours, tourController.getAllTours);
+
+router.route("/stats").get(tourController.getStats);
+router.route("/plan").get(tourController.getMonthlyPlan);
+
+router
   .route("/")
   .get(tourController.getAllTours)
   .post(checkBody, tourController.createTour);

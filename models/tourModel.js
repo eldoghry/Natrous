@@ -1,3 +1,4 @@
+import { query } from "express";
 import mongoose from "mongoose";
 import slugify from "slugify";
 
@@ -71,18 +72,47 @@ const tourSchema = new mongoose.Schema(
     startDates: [Date],
 
     slug: String,
+
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 //Model Middleware
 tourSchema.pre("save", function (next) {
   //this is created doc
-  //create slug for document
-
-  this.slug = slugify(this.name);
+  //create auto slug for document in creation
+  this.slug = slugify(this.name, { lower: true });
 
   next();
+});
+
+//Query Middleware
+// assume that secret tours not supposed to displayed in list result
+tourSchema.pre("find", function (next) {
+  //this here is query
+  // do query as I want
+  this.find({ secretTour: { $ne: true } });
+
+  next();
+});
+
+//Query Middleware
+// assume that secret tours not supposed to displayed in list result
+tourSchema.pre("aggregate", function (next) {
+  //this here is query
+  // do query as I want
+  // this.find({ secretTour: { $ne: true } });
+
+  next();
+});
+
+// create virtual properties
+tourSchema.virtual("durationWeeks").get(function () {
+  return this.duration / 7;
 });
 
 export default mongoose.model("Tour", tourSchema);

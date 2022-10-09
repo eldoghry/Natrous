@@ -62,7 +62,6 @@ export const deleteTour = async (req, res) => {
 
 export const updateTour = async (req, res) => {
   try {
-    console.log(req.body);
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -74,5 +73,82 @@ export const updateTour = async (req, res) => {
       status: "fail",
       message: error,
     });
+  }
+};
+
+export const aliasTopTours = async (req, res, next) => {
+  req.query.sort = "-ratingsAverage,price";
+  req.query.limit = "5";
+  req.query.fields = "name,price,ratingsAverage,summary,difficulty";
+
+  // getAllTours(req, res);
+
+  next();
+};
+
+export const getStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      // { $match: { secretTour: { $ne: true }, ratingsAverage: { $gte: 4.8 } } },
+      {
+        $group: {
+          // _id: {
+          //   $toUpper: "$difficulty",
+          // },
+
+          _id: "$difficulty",
+
+          toursNum: { $sum: 1 },
+          minAvgRating: { $min: "$ratingsAverage" },
+          maxAvgRating: { $max: "$ratingsAverage" },
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" },
+          tours: { $addToSet: "$name" },
+          // tours: { $addToSet: { name: "$name", price: "$price" } },
+        },
+      },
+      {
+        $sort: {
+          toursNum: -1,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      requestTime: req.requestTime,
+      stats,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+};
+
+export const getMonthlyPlan = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      // { $match: { secretTour: { $ne: true }, ratingsAverage: { $gte: 4.8 } } },
+      {
+        $group: {
+          _id: {
+            $month: "$createdAt",
+          },
+
+          tours: {
+            $sum: 1,
+          },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      requestTime: req.requestTime,
+      stats,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
   }
 };
