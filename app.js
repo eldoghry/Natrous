@@ -23,7 +23,10 @@ app.all("*", (req, res, next) => {
   next(new AppError(`${req.originalUrl} is invalid url!!`, 404));
 });
 
-//HANDLING GENERAL APP ERROR RESPONSE
+//HANDLING EXPRESS APP ERROR RESPONSE
 app.use(globalErrorHandler);
+
+
+
 
 export default app;
