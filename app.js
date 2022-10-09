@@ -26,7 +26,4 @@ app.all("*", (req, res, next) => {
 //HANDLING EXPRESS APP ERROR RESPONSE
 app.use(globalErrorHandler);
 
-
-
-
 export default app;
