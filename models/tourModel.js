@@ -10,6 +10,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       unique: true,
       maxlength: [40, "A tour name must have less or equal then 40 characters"],
+      minlength: [10, "A tour name must have more or equal then 10 characters"],
     },
 
     summary: {
@@ -62,6 +63,8 @@ const tourSchema = new mongoose.Schema(
     ratingsAverage: {
       type: Number,
       default: 4.9,
+      min: [1, "Tour rating must be between [1,5]"],
+      max: [5, "Tour rating must be between [1,5]"],
     },
 
     ratingsQuantity: {
