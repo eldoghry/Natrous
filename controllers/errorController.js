@@ -28,11 +28,17 @@ const handleValidationErrDB = (err) => {
   return new AppError(
     `Validation Error: ${errors.map((el) => el.message).join(", ")}`,
     400
-  );          
+  );
 };
 
-const handleCastErrDB = (err) =>  new AppError(`Invalid ${err.path}:${err.value}`, 400);
+const handleCastErrDB = (err) =>
+  new AppError(`Invalid ${err.path}:${err.value}`, 400);
 
+const handleJWTErr = () =>
+  new AppError(`Token have been Invalid, Please login again`, 401);
+
+const handleJWTExpireErr = () =>
+  new AppError(`Token have been expired, Please login again`, 401);
 
 // GLOBAL ERROR HANDLER
 export default (err, req, res, next) => {
@@ -42,7 +48,6 @@ export default (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
 
   if (process.env.NODE_ENV === "development") {
-    console.log("development work");
     sendErrorResHandler(err, req, res);
   } else {
     let error = { ...err };
@@ -52,6 +57,8 @@ export default (err, req, res, next) => {
     if (error.code === 11000) error = handleDuplicatedInptsDB(error);
     if (error.name === "CastError") error = handleCastErrDB(error);
     if (error.name === "ValidationError") error = handleValidationErrDB(error);
+    if (error.name === "JsonWebTokenError") error = handleJWTErr();
+    if (error.name === "TokenExpiredError") error = handleJWTExpireErr();
 
     sendErrorResHandler(error, req, res);
   }

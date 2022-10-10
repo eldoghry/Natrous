@@ -4,11 +4,10 @@ import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
-    username: {
+    name: {
       type: String,
-      required: [true, "A User must have a username"],
+      required: [true, "A User must have a name"],
       trim: true,
-      unique: true,
       lowercase: true,
     },
 
@@ -21,6 +20,13 @@ const userSchema = new mongoose.Schema(
     },
 
     photo: String,
+
+    role: {
+      type: String,
+      required: [true, "A User must have a role"],
+      enum: ["user", "admin"],
+      default: "user",
+    },
 
     password: {
       type: String,
@@ -40,6 +46,8 @@ const userSchema = new mongoose.Schema(
         message: "Password are not the same",
       },
     },
+
+    passwordChangedAt: Date,
   },
   { timestamps: true }
 );
@@ -58,8 +66,24 @@ userSchema.pre("save", async function () {
 
 //Instance Methods: check login password is correct
 userSchema.methods.isCorrectPassword = async function (plainPassword) {
-  console.log(this);
+  //   console.log(this);
   return await bcrypt.compare(plainPassword, this.password);
+};
+
+//Instance Methods: check if user changePassword after token
+userSchema.methods.changedPasswordAfter = function (jwtTimestamp) {
+  /*
+        when user change his password, passwordChangedAt field will be time of changing,
+        so if server got jwttime that before changing time will consider unvalid token
+    */
+
+  //1) user never change his password
+  if (!this.passwordChangedAt) return false;
+
+  const formatedTime = this.passwordChangedAt.getTime() / 1000; //time in sec
+
+  //2) check if jwtTimestamp older than changing password time
+  return jwtTimestamp <= formatedTime;
 };
 
 export default mongoose.model("User", userSchema);

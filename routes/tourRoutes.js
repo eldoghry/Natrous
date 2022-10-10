@@ -1,6 +1,7 @@
 import express from "express";
 import * as tourController from "./../controllers/tourController.js";
 import checkBody from "../middlewares/checkBody.js";
+import { protect } from "../controllers/authController.js";
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.route("/plan").get(tourController.getMonthlyPlan);
 
 router
   .route("/")
-  .get(tourController.getAllTours)
+  .get(protect, tourController.getAllTours)
   .post(checkBody, tourController.createTour);
 
 router
