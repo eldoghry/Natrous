@@ -5,38 +5,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { promisify } from "util";
 
-// ************ MIDDLEWARES ************
-
-export const protect = catchAsync(async (req, res, next) => {
-  // 1) check if header authorization
-  if (!req.headers.authorization)
-    return next(new AppError("please login first", 401));
-
-  // 2) get token from request and validate it
-  const token = req.headers.authorization.split(" ")[1];
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-  // 2) check if user is exist db
-  const currentUser = await User.findOne({ _id: decoded.id });
-
-  if (!currentUser)
-    return next(
-      new AppError(
-        "Invalid Token, Token not belong to any users, Please try to Login",
-        401
-      )
-    );
-
-  //3) token time older than changin password time
-  if (currentUser.changedPasswordAfter(decoded.iat))
-    return next(new AppError("Token are expired, Please try to Login", 401));
-
-  req.user = currentUser;
-  next();
-});
-
-// ************ EOF MIDDLEWARES ************
-
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -74,3 +42,43 @@ export const login = catchAsync(async (req, res, next) => {
 
   res.status(202).json({ status: "success", token });
 });
+
+//PROTECT MIDDLEWARE
+export const protect = catchAsync(async (req, res, next) => {
+  // 1) check if header authorization
+  if (!req.headers.authorization)
+    return next(new AppError("please login first", 401));
+
+  // 2) Validate Token
+  const token = req.headers.authorization.split(" ")[1];
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // 3) check user existance
+  const currentUser = await User.findOne({ _id: decoded.id });
+
+  if (!currentUser)
+    return next(
+      new AppError(
+        "Invalid Token, Token not belong to any users, Please try to Login",
+        401
+      )
+    );
+
+  //4) check if token time older than changing password time
+  if (currentUser.changedPasswordAfter(decoded.iat))
+    return next(new AppError("Token are expired, Please try to Login", 401));
+
+  req.user = currentUser;
+  next();
+});
+
+//Authorize MIDDLEWARE
+export const authorize = (roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError("you are not authorized to do that", 403));
+    }
+
+    next();
+  };
+};

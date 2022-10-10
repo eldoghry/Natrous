@@ -1,7 +1,7 @@
 import express from "express";
 import * as tourController from "./../controllers/tourController.js";
 import checkBody from "../middlewares/checkBody.js";
-import { protect } from "../controllers/authController.js";
+import { protect, authorize } from "../controllers/authController.js";
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router
 router
   .route("/:id")
   .get(tourController.getTour)
-  .delete(tourController.deleteTour)
+  .delete(protect, authorize(["admin"]), tourController.deleteTour)
   .patch(checkBody, tourController.updateTour);
 
 export default router;
