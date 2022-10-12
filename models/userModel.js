@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 
+//***************** SCHEMA *****************
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -48,9 +50,13 @@ const userSchema = new mongoose.Schema(
     },
 
     passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpire: Date,
   },
   { timestamps: true }
 );
+
+//***************** MIDDLEWARES *****************
 
 userSchema.pre("save", async function () {
   //1) Hashing password
@@ -64,19 +70,17 @@ userSchema.pre("save", async function () {
   this.passwordConfirm = undefined;
 });
 
+//***************** INSTANCE METHODS *****************
 //Instance Methods: check login password is correct
 userSchema.methods.isCorrectPassword = async function (plainPassword) {
   //   console.log(this);
   return await bcrypt.compare(plainPassword, this.password);
 };
 
-//Instance Methods: check if user changePassword after token
+/* Instance Methods: check if user changePassword after token
+when user change his password, passwordChangedAt field will be time of changing,
+so if server got jwttime that before changing time will consider unvalid token */
 userSchema.methods.changedPasswordAfter = function (jwtTimestamp) {
-  /*
-        when user change his password, passwordChangedAt field will be time of changing,
-        so if server got jwttime that before changing time will consider unvalid token
-    */
-
   //1) user never change his password
   if (!this.passwordChangedAt) return false;
 
@@ -84,6 +88,23 @@ userSchema.methods.changedPasswordAfter = function (jwtTimestamp) {
 
   //2) check if jwtTimestamp older than changing password time
   return jwtTimestamp <= formatedTime;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  // this.passwordResetExpire(new Date(Date.now() + 10 * 60 * 1000)); //10 min from now
+
+  // 1) create resetToken
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  // 2) create hash token to be saved in DB
+  const hash = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+  this.passwordResetToken = hash;
+  this.passwordResetExpire = new Date(Date.now() + 10 * 60 * 1000); //10 min from now
+
+  console.log({ resetToken, hash });
+
+  return resetToken;
 };
 
 export default mongoose.model("User", userSchema);

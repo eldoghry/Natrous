@@ -4,6 +4,8 @@ import AppError from "../utils/AppError.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { promisify } from "util";
+import crypto from "crypto";
+import sendMail from "../utils/mail.js";
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -40,6 +42,83 @@ export const login = catchAsync(async (req, res, next) => {
   //generate token
   const token = signToken(user._id);
 
+  res.status(202).json({ status: "success", token });
+});
+
+export const forgetPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  // 1) get email from user
+  // 2) generate resetToken
+  // 3) hashing resetToken and save it on db
+  // 4) send reset url to user
+
+  if (!email)
+    return next(new AppError("email are required to reset password", 400));
+
+  const user = await User.findOne({ email });
+
+  if (!user) return next(new AppError("email not belong to any user", 400));
+
+  //generate token
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  // send url by email
+  try {
+    const mailResponse = await sendMail({
+      to: user.email,
+      subject: "Reset Password - valid for 10 min",
+      message: `http://127.0.0.1:3000/api/v1/users/resetPassword/${resetToken}`,
+      type: "text",
+    });
+    // console.log(mailResponse);
+  } catch (error) {
+    // undo somethings
+    user.passwordResetToken = undefined;
+    user.passwordResetExpire = undefined;
+    user.save({ validateBeforeSave: false });
+
+    // console.log(error);
+    return next(
+      new AppError("Something went wrong, Please try again later", 500)
+    );
+  }
+
+  res.status(200).json({
+    status: "success",
+    // resetToken,
+    // message: `http://127.0.0.1:3000/api/v1/users/resetPassword/${resetToken}`,
+    message: `please check your email to get reset url`,
+  });
+});
+
+export const resetPassword = catchAsync(async (req, res, next) => {
+  const { resetToken } = req.params;
+  const { password, passwordConfirm } = req.body;
+
+  const hash = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hash,
+    passwordResetExpire: {
+      $gte: Date.now(),
+    },
+  });
+
+  if (!user) return next(new AppError("Invalid or expired token", 400));
+
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  user.passwordChangedAt = Date.now();
+
+  //remove unnessasry reset token fields
+  user.passwordResetToken = undefined;
+  user.passwordResetExpire = undefined;
+
+  await user.save();
+
+  const token = signToken(user._id);
   res.status(202).json({ status: "success", token });
 });
 
