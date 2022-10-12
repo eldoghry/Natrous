@@ -26,8 +26,13 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: [true, "A User must have a role"],
-      enum: ["user", "admin"],
+      enum: ["user", "admin", "guide"],
       default: "user",
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
     },
 
     password: {
@@ -57,8 +62,13 @@ const userSchema = new mongoose.Schema(
 );
 
 /***************** MIDDLEWARES *****************/
+userSchema.pre(/^find/, function (next) {
+  console.log("find run first");
+ this.find({ isActive: { $ne: false } });
+  next();
+});
 
-userSchema.pre("save", async function () {
+userSchema.pre("save", async function (next) {
   //1) Hashing password
   //In case password are created or modified
   if (this.isModified("password")) {
@@ -68,12 +78,12 @@ userSchema.pre("save", async function () {
 
   //2) remove password Confirm field
   this.passwordConfirm = undefined;
+  next();
 });
 
 /***************** INSTANCE METHODS *****************/
 //Instance Methods: check login password is correct
 userSchema.methods.isCorrectPassword = async function (plainPassword) {
-  //   console.log(this);
   return await bcrypt.compare(plainPassword, this.password);
 };
 

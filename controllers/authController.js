@@ -12,6 +12,16 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+const filterObj = (obj, ...excluded) => {
+  const filteredObj = {};
+
+  Object.keys(obj).forEach((key) => {
+    if (!excluded.includes(key)) filteredObj[key] = obj[key];
+  });
+
+  return filteredObj;
+};
+
 /***************** MIDDLEWARES *****************/
 //PROTECT MIDDLEWARE
 export const protect = catchAsync(async (req, res, next) => {
@@ -64,6 +74,7 @@ export const signup = catchAsync(async (req, res, next) => {
 
   //TESTING
   const user = await User.create(req.body);
+  user.password = undefined; //hide password from response
 
   const token = signToken(user._id);
 
@@ -186,12 +197,20 @@ export const updateMe = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: "success", user });
 });
 
-const filterObj = (obj, ...excluded) => {
-  const filteredObj = {};
+// authorized user can delete his account (change isActive to false)
+export const deleteMe = catchAsync(async (req, res, next) => {
+  const { password } = req.body;
 
-  Object.keys(obj).forEach((key) => {
-    if (!excluded.includes(key)) filteredObj[key] = obj[key];
-  });
+  const user = await User.findById(req.user._id).select("+password");
 
-  return filteredObj;
-};
+  //2) check password
+  if (!password || !(await user.isCorrectPassword(password)))
+    return next(new AppError("you are not authorized to do that", 403));
+
+  user.isActive = false;
+  await user.save({ validateBeforeSave: false });
+
+  res
+    .status(204)
+    .json({ status: "success", message: "User have been deleted" });
+});
