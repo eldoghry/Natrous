@@ -3,7 +3,7 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
-//***************** SCHEMA *****************
+/***************** SCHEMA *****************/
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -56,7 +56,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//***************** MIDDLEWARES *****************
+/***************** MIDDLEWARES *****************/
 
 userSchema.pre("save", async function () {
   //1) Hashing password
@@ -70,7 +70,7 @@ userSchema.pre("save", async function () {
   this.passwordConfirm = undefined;
 });
 
-//***************** INSTANCE METHODS *****************
+/***************** INSTANCE METHODS *****************/
 //Instance Methods: check login password is correct
 userSchema.methods.isCorrectPassword = async function (plainPassword) {
   //   console.log(this);
