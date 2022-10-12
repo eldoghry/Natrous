@@ -63,8 +63,7 @@ const userSchema = new mongoose.Schema(
 
 /***************** MIDDLEWARES *****************/
 userSchema.pre(/^find/, function (next) {
-  console.log("find run first");
- this.find({ isActive: { $ne: false } });
+  this.find({ isActive: { $ne: false } });
   next();
 });
 
