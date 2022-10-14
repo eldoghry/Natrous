@@ -18,15 +18,37 @@ router
   .route("/deleteMe")
   .delete(authController.protect, authController.deleteMe);
 
-// router
-//   .route("/")
-//   .get(userController.getAllUsers)
-//   .post(checkBody, userController.createUser);
+router
+  .route("/")
+  .get(
+    authController.protect,
+    authController.authorize("admin"),
+    userController.getAllUsers
+  )
+  .post(
+    authController.protect,
+    authController.authorize("admin"),
+    checkBody,
+    userController.createUser
+  );
 
-// router
-//   .route("/:id")
-//   .get(userController.getUser)
-//   .delete(userController.deleteUser)
-//   .patch(checkBody, userController.updateUser);
+router
+  .route("/:id")
+  .get(
+    authController.protect,
+    authController.authorize("admin"),
+    userController.getUser
+  )
+  .delete(
+    authController.protect,
+    authController.authorize("admin"),
+    userController.deleteUser
+  )
+  .patch(
+    authController.protect,
+    authController.authorize("admin"),
+    checkBody,
+    userController.updateUser
+  );
 
 export default router;

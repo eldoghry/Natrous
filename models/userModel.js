@@ -80,6 +80,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+
 /***************** INSTANCE METHODS *****************/
 //Instance Methods: check login password is correct
 userSchema.methods.isCorrectPassword = async function (plainPassword) {

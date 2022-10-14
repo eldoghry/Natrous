@@ -65,6 +65,8 @@ export const authorize = (roles) => {
 
 /***************** HANDLERS *****************/
 export const signup = catchAsync(async (req, res, next) => {
+  console.log(req.body);
+
   //   const user = await User.create({
   //     name: req.body.name,
   //     email: req.body.email,
@@ -83,6 +85,8 @@ export const signup = catchAsync(async (req, res, next) => {
 
 export const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
+
+  console.log(req.body);
 
   if (!email || !password)
     return next(new AppError("email and password are required", 400));

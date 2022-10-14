@@ -7,18 +7,28 @@ import addRequestTime from "./middlewares/addRequestTime.js";
 import globalErrorHandler from "./controllers/errorController.js";
 import AppError from "./utils/AppError.js";
 import rateLimit from "express-rate-limit";
+import xss from "xss-clean";
+import hpp from "hpp";
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 
 dotenv.config();
 
 const app = express();
 
 /**** GENERAL MIDDLEWAERS ****/
+
+//Set security HTTP headers
+app.use(helmet());
+
+// Development Logging
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
 // EXPRESS BODY PARSER
-app.use(express.json());
+app.use(express.json({ limit: "1kb" }));
+app.use(express.urlencoded({ extended: true }));
 
 //LIMIT EXPRESS RATE FROM SINGLE IP
 const apiLimiter = rateLimit({
@@ -30,6 +40,28 @@ const apiLimiter = rateLimit({
 
 // Apply the rate limiting middleware to API calls only
 app.use("/api", apiLimiter);
+
+//prevent MongoDB Operator Injection.
+app.use(mongoSanitize());
+
+//sanitize user input coming from POST body, GET queries, and url params to prevent Cross Site Scripting (XSS) attack.
+// ex: name: <h1>attacker</h1>
+app.use(xss());
+
+//Prevent paramater pollution ex: sort=price & sort=createdAt (price will be ignored)
+app.use(
+  hpp({
+    //stop hpp for this fields
+    whitelist: [
+      "duration",
+      "ratingsQuantity",
+      "ratingsAverage",
+      "maxGroupSize",
+      "difficulty",
+      "price",
+    ],
+  })
+);
 
 //TEST MIDDLEWARE
 app.use(addRequestTime);

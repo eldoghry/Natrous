@@ -15,7 +15,8 @@ export const getAllUsers = catchAsync(async (req, res, next) => {
 });
 
 export const createUser = catchAsync(async (req, res, next) => {
-  const user = await User.create(req.body);
+  const user = await await User.create(req.body);
+  user.password = undefined;
   res.status(201).json({ status: "success", user });
 });
 
