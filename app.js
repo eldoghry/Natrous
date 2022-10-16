@@ -1,7 +1,5 @@
 import express from "express";
 import morgan from "morgan";
-import tourRoutes from "./routes/tourRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
 import * as dotenv from "dotenv";
 import addRequestTime from "./middlewares/addRequestTime.js";
 import globalErrorHandler from "./controllers/errorController.js";
@@ -11,6 +9,9 @@ import xss from "xss-clean";
 import hpp from "hpp";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
+import tourRoutes from "./routes/tourRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 dotenv.config();
 
@@ -68,6 +69,7 @@ app.use(addRequestTime);
 
 app.use("/api/v1/tours", tourRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/reviews", reviewRoutes);
 
 // HANDLING UNKOWEN ROUTES
 app.all("*", (req, res, next) => {

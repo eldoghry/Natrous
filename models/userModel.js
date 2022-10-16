@@ -62,10 +62,14 @@ const userSchema = new mongoose.Schema(
 );
 
 /***************** MIDDLEWARES *****************/
+
+//return active users only
 userSchema.pre(/^find/, function (next) {
   this.find({ isActive: { $ne: false } });
   next();
 });
+
+
 
 userSchema.pre("save", async function (next) {
   //1) Hashing password
@@ -79,7 +83,6 @@ userSchema.pre("save", async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
-
 
 /***************** INSTANCE METHODS *****************/
 //Instance Methods: check login password is correct

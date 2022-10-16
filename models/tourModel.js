@@ -105,6 +105,8 @@ const tourSchema = new mongoose.Schema(
         coordinates: [Number],
       },
     ],
+
+    guides: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
@@ -124,6 +126,17 @@ tourSchema.pre("find", function (next) {
   //this here is query
   // do query as I want
   this.find({ secretTour: { $ne: true } });
+
+  next();
+});
+
+//populate tours
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    // match: { age: { $gte: 21 } },
+    select: "name _id",
+  });
 
   next();
 });
