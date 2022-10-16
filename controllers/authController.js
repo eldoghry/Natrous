@@ -53,8 +53,8 @@ export const protect = catchAsync(async (req, res, next) => {
 });
 
 //Authorize MIDDLEWARE
-export const authorize = (roles) => {
-  return (req, res, next) => {
+export const restrictTo = (roles) => {
+  return (req, _res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(new AppError("you are not authorized to do that", 403));
     }
@@ -217,4 +217,11 @@ export const deleteMe = catchAsync(async (req, res, next) => {
   res
     .status(204)
     .json({ status: "success", message: "User have been deleted" });
+});
+
+// authorized user get his info
+export const getMe = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  res.status(200).json({ status: "success", user });
 });

@@ -18,16 +18,18 @@ router
   .route("/deleteMe")
   .delete(authController.protect, authController.deleteMe);
 
+router.route("/me").get(authController.protect, authController.getMe);
+
 router
   .route("/")
   .get(
     authController.protect,
-    authController.authorize("admin"),
+    authController.restrictTo("admin"),
     userController.getAllUsers
   )
   .post(
     authController.protect,
-    authController.authorize("admin"),
+    authController.restrictTo("admin"),
     checkBody,
     userController.createUser
   );
@@ -36,17 +38,17 @@ router
   .route("/:id")
   .get(
     authController.protect,
-    authController.authorize("admin"),
+    authController.restrictTo("admin"),
     userController.getUser
   )
   .delete(
     authController.protect,
-    authController.authorize("admin"),
+    authController.restrictTo("admin"),
     userController.deleteUser
   )
   .patch(
     authController.protect,
-    authController.authorize("admin"),
+    authController.restrictTo("admin"),
     checkBody,
     userController.updateUser
   );

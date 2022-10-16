@@ -1,8 +1,7 @@
 import express from "express";
 import * as tourController from "./../controllers/tourController.js";
+import * as authController from "../controllers/authController.js";
 import checkBody from "../middlewares/checkBody.js";
-import { protect, authorize } from "../controllers/authController.js";
-
 const router = express.Router();
 
 router
@@ -14,13 +13,17 @@ router.route("/plan").get(tourController.getMonthlyPlan);
 
 router
   .route("/")
-  .get(protect, tourController.getAllTours)
+  .get(authController.protect, tourController.getAllTours)
   .post(checkBody, tourController.createTour);
 
 router
   .route("/:id")
   .get(tourController.getTour)
-  .delete(protect, authorize(["admin"]), tourController.deleteTour)
+  .delete(
+    authController.protect,
+    authController.restrictTo(["admin"]),
+    tourController.deleteTour
+  )
   .patch(checkBody, tourController.updateTour);
 
 export default router;
