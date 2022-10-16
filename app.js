@@ -27,7 +27,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // EXPRESS BODY PARSER
-app.use(express.json({ limit: "1kb" }));
+app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 //LIMIT EXPRESS RATE FROM SINGLE IP
