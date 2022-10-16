@@ -53,7 +53,7 @@ export const protect = catchAsync(async (req, res, next) => {
 });
 
 //Authorize MIDDLEWARE
-export const restrictTo = (roles) => {
+export const restrictTo = (...roles) => {
   return (req, _res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(new AppError("you are not authorized to do that", 403));
@@ -85,8 +85,6 @@ export const signup = catchAsync(async (req, res, next) => {
 
 export const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-
-  console.log(req.body);
 
   if (!email || !password)
     return next(new AppError("email and password are required", 400));

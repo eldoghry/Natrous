@@ -2,7 +2,12 @@ import express from "express";
 import * as tourController from "./../controllers/tourController.js";
 import * as authController from "../controllers/authController.js";
 import checkBody from "../middlewares/checkBody.js";
+import reviewRouter from "./reviewRoutes.js";
 const router = express.Router();
+
+// reviews nested route
+// ex: GET /tour/123/reviews
+router.use("/:tourId/reviews", reviewRouter);
 
 router
   .route("/top-cheap-tours")

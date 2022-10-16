@@ -67,8 +67,8 @@ app.use(
 //TEST MIDDLEWARE
 app.use(addRequestTime);
 
-app.use("/api/v1/tours", tourRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/tours", tourRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
 
 // HANDLING UNKOWEN ROUTES
