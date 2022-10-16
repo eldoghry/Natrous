@@ -111,10 +111,9 @@ const tourSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-//Model Middleware
+//Model Middleware: create auto slug for document in creation
 tourSchema.pre("save", function (next) {
   //this is created doc
-  //create auto slug for document in creation
   this.slug = slugify(this.name, { lower: true });
 
   next();
@@ -130,12 +129,24 @@ tourSchema.pre("find", function (next) {
   next();
 });
 
+//track reviews virtualy as there is no reviews in schema
+tourSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id", // tour primary key
+  foreignField: "tour", // name of foriegn key on review doc
+});
+
 //populate tours
 tourSchema.pre(/^find/, function (next) {
   this.populate({
     path: "guides",
     // match: { age: { $gte: 21 } },
-    select: "name _id",
+    select: "name email photo",
+  });
+
+  this.populate({
+    path: "reviews",
+    select: "review",
   });
 
   next();

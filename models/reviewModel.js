@@ -14,19 +14,26 @@ const reviewSchema = new mongoose.Schema(
       max: [5, "Review rating must be between [1,5]"],
     },
 
-    user: { type: mongoose.Schema.ObjectId, ref: "User", required: true },
-    tour: { type: mongoose.Schema.ObjectId, ref: "Tour", required: true },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      required: [true, "Review must belong to a user."],
+    },
+    tour: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Tour",
+      required: [true, "Review must belong to a tour."],
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-reviewSchema.pre("save", function (next) {
+reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: "user",
-    select: "name",
+    select: "name photo",
   });
 
-  this.populate({ path: "tour", select: "name" });
   next();
 });
 
