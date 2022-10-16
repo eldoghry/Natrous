@@ -65,17 +65,15 @@ export const restrictTo = (...roles) => {
 
 /***************** HANDLERS *****************/
 export const signup = catchAsync(async (req, res, next) => {
-  console.log(req.body);
-
-  //   const user = await User.create({
-  //     name: req.body.name,
-  //     email: req.body.email,
-  //     password: req.body.password,
-  //     passwordConfirm: req.body.passwordConfirm,
-  //   });
+  const user = await User.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm,
+  });
 
   //TESTING
-  const user = await User.create(req.body);
+  // const user = await User.create(req.body);
   user.password = undefined; //hide password from response
 
   const token = signToken(user._id);
@@ -101,25 +99,23 @@ export const login = catchAsync(async (req, res, next) => {
 });
 
 export const forgetPassword = catchAsync(async (req, res, next) => {
-  const { email } = req.body;
-
   // 1) get email from user
-  // 2) generate resetToken
-  // 3) hashing resetToken and save it on db
-  // 4) send reset url to user
+  const { email } = req.body;
 
   if (!email)
     return next(new AppError("email are required to reset password", 400));
 
+  // 2) check is email is found in db
   const user = await User.findOne({ email });
-
   if (!user) return next(new AppError("email not belong to any user", 400));
 
-  //generate token
+  // 3) generate resetToken
   const resetToken = user.createPasswordResetToken();
+
+  // 4) hashing resetToken and save it on db
   await user.save({ validateBeforeSave: false });
 
-  // send url by email
+  // 5) send reset url to user
   try {
     const mailResponse = await sendMail({
       to: user.email,
@@ -129,12 +125,13 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
     });
     // console.log(mailResponse);
   } catch (error) {
-    // undo somethings
+    // console.log(error);
+    // undo everythings
     user.passwordResetToken = undefined;
     user.passwordResetExpire = undefined;
+    user.passwordChangedAt = undefined;
     user.save({ validateBeforeSave: false });
 
-    // console.log(error);
     return next(
       new AppError("Something went wrong, Please try again later", 500)
     );
@@ -143,7 +140,7 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     // resetToken,
-    // message: `http://127.0.0.1:3000/api/v1/users/resetPassword/${resetToken}`,
+    url: `http://127.0.0.1:3000/api/v1/users/resetPassword/${resetToken}`,
     message: `please check your email to get reset url`,
   });
 });
@@ -165,7 +162,7 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 
   user.password = password;
   user.passwordConfirm = passwordConfirm;
-  user.passwordChangedAt = Date.now();
+  // user.passwordChangedAt = Date.now();
 
   //remove unnessasry reset token fields
   user.passwordResetToken = undefined;
@@ -179,7 +176,16 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 
 // authorized user can update his account
 export const updateMe = catchAsync(async (req, res, next) => {
-  //1) filter body
+  //1) raise error if user try to update password
+  if (req.body.password || req.body.passwordConfirm)
+    next(
+      new AppError(
+        "This route is not for password updates, Please use /updateMyPassword",
+        400
+      )
+    );
+
+  //2) filter body
   const filtered = filterObj(
     req.body,
     "role",
@@ -190,13 +196,39 @@ export const updateMe = catchAsync(async (req, res, next) => {
     "passwordChangedAt"
   );
 
-  //2) upate current user
+  //3) upate current user
   const user = await User.findByIdAndUpdate(req.user._id, filtered, {
     new: true,
     runValidators: true,
   });
 
   res.status(200).json({ status: "success", user });
+});
+
+// TODO: updatemypassword
+export const updateMyPassword = catchAsync(async (req, res, next) => {
+  //1) get & check current password
+  const { currentPassword, password, passwordConfirm } = req.body;
+  if (!currentPassword || !password || !passwordConfirm)
+    return next(
+      new AppError(
+        "currentPassword, password, passwordConfirm are required",
+        400
+      )
+    );
+
+  const user = await User.findById(req.user._id).select("password");
+
+  if (!(await user.isCorrectPassword(currentPassword)))
+    return next(new AppError("currentPassword is incorrect", 400));
+
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+
+  await user.save();
+
+  const token = signToken(user._id);
+  res.status(202).json({ status: "success", token });
 });
 
 // authorized user can delete his account (change isActive to false)

@@ -10,46 +10,29 @@ router.route("/login").post(authController.login);
 router.route("/forgetPassword").post(authController.forgetPassword);
 router.route("/resetPassword/:resetToken").patch(authController.resetPassword);
 
-router
-  .route("/updateMe")
-  .patch(authController.protect, authController.updateMe);
+// all the following will be protecting
+router.use(authController.protect);
 
-router
-  .route("/deleteMe")
-  .delete(authController.protect, authController.deleteMe);
+router.route("/updateMe").patch(authController.updateMe);
+router.route("/updateMyPassword").patch(authController.updateMyPassword);
+router.route("/deleteMe").delete(authController.deleteMe);
+router.route("/me").get(authController.getMe);
 
-router.route("/me").get(authController.protect, authController.getMe);
+// all the following will be restricting to admins only
+router.use(authController.restrictTo("admin"));
 
 router
   .route("/")
-  .get(
-    authController.protect,
-    authController.restrictTo("admin"),
-    userController.getAllUsers
-  )
-  .post(
-    authController.protect,
-    authController.restrictTo("admin"),
-    checkBody,
-    userController.createUser
-  );
+  .get(userController.getAllUsers)
+  .post(checkBody, userController.createUser);
 
 router
   .route("/:id")
-  .get(
-    authController.protect,
-    authController.restrictTo("admin"),
-    userController.getUser
-  )
-  .delete(
-    authController.protect,
-    authController.restrictTo("admin"),
-    userController.deleteUser
-  )
+  .get(userController.getUser)
+  .delete(userController.deleteUser)
   .patch(
-    authController.protect,
-    authController.restrictTo("admin"),
     checkBody,
+    userController.disablePasswordChanging,
     userController.updateUser
   );
 

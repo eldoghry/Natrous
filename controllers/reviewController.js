@@ -6,6 +6,7 @@ import AppError from "../utils/AppError.js";
 export const getAllReviews = catchAsync(async (req, res, next) => {
   let filter = {};
   if (req.params.tourId) filter = { tour: req.params.tourId };
+  if (req.body.tour) filter = { tour: req.body.tour };
 
   const reviews = await Review.find(filter);
 

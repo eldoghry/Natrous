@@ -115,7 +115,6 @@ const tourSchema = new mongoose.Schema(
 tourSchema.pre("save", function (next) {
   //this is created doc
   this.slug = slugify(this.name, { lower: true });
-
   next();
 });
 
@@ -125,7 +124,6 @@ tourSchema.pre("find", function (next) {
   //this here is query
   // do query as I want
   this.find({ secretTour: { $ne: true } });
-
   next();
 });
 

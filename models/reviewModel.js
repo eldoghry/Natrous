@@ -38,7 +38,7 @@ reviewSchema.pre(/^find/, function (next) {
 });
 
 reviewSchema.methods.isUserOwnReview = function (userId) {
-  return this.user.toString() === userId.toString();
+  return this.user.id === userId.toString();
 };
 
 export default mongoose.model("Review", reviewSchema);

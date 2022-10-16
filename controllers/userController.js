@@ -2,51 +2,27 @@ import APIFeatures from "../utils/apiFeatures.js";
 import User from "../models/userModel.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/AppError.js";
+import * as factory from "./handlerFactory.js";
 
-export const getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find({});
+export const getAllUsers = factory.getAll(User);
 
-  res.status(200).json({
-    status: "success",
-    results: users.length,
-    requestTime: req.requestTime,
-    users,
-  });
-});
+// TODO: remove password from response
+export const createUser = factory.createOne(User);
+export const getUser = factory.getOne(User);
+export const deleteUser = factory.deleteOne(User);
 
-export const createUser = catchAsync(async (req, res, next) => {
-  const user = await await User.create(req.body);
-  user.password = undefined;
-  res.status(201).json({ status: "success", user });
-});
+//disabled changing password by this handler
+export const updateUser = factory.updateOne(User);
 
-export const getUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+/*** Middlewares ***/
+export const disablePasswordChanging = (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm)
+    return next(
+      new AppError(
+        "This route not for update password, Please remove (password | passwrodConfirm) from request",
+        400
+      )
+    );
 
-  if (!user) {
-    return next(new AppError("User not exist", 400));
-  }
-
-  res.status(200).json({ status: "success", user });
-});
-
-export const deleteUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndDelete(req.params.id);
-  if (!user) {
-    return next(new AppError("User not exist", 400));
-  }
-  res.status(204).send("deleted");
-});
-
-export const updateUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!user) {
-    return next(new AppError("User not exist", 400));
-  }
-
-  res.status(200).json({ status: "success", user });
-});
+  next();
+};

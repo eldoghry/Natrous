@@ -14,21 +14,38 @@ router
   .get(tourController.aliasTopTours, tourController.getAllTours);
 
 router.route("/stats").get(tourController.getStats);
-router.route("/plan").get(tourController.getMonthlyPlan);
+
+router
+  .route("/plan")
+  .get(
+    authController.protect,
+    authController.restrictTo("admin"),
+    tourController.getMonthlyPlan
+  );
 
 router
   .route("/")
-  .get(authController.protect, tourController.getAllTours)
-  .post(checkBody, tourController.createTour);
+  .get(tourController.getAllTours)
+  .post(
+    checkBody,
+    authController.protect,
+    authController.restrictTo("admin"),
+    tourController.createTour
+  );
 
 router
   .route("/:id")
   .get(tourController.getTour)
   .delete(
     authController.protect,
-    authController.restrictTo(["admin"]),
+    authController.restrictTo("admin"),
     tourController.deleteTour
   )
-  .patch(checkBody, tourController.updateTour);
+  .patch(
+    checkBody,
+    authController.protect,
+    authController.restrictTo("admin"),
+    tourController.updateTour
+  );
 
 export default router;

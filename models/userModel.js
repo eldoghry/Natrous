@@ -69,8 +69,6 @@ userSchema.pre(/^find/, function (next) {
   next();
 });
 
-
-
 userSchema.pre("save", async function (next) {
   //1) Hashing password
   //In case password are created or modified
@@ -81,6 +79,14 @@ userSchema.pre("save", async function (next) {
 
   //2) remove password Confirm field
   this.passwordConfirm = undefined;
+  next();
+});
+
+//passwordChangedAt reduced by 1 sec to be less than new jwt token
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
@@ -106,7 +112,7 @@ userSchema.methods.changedPasswordAfter = function (jwtTimestamp) {
 userSchema.methods.createPasswordResetToken = function () {
   // this.passwordResetExpire(new Date(Date.now() + 10 * 60 * 1000)); //10 min from now
 
-  // 1) create resetToken
+  // 1) create resetToken acting as plain password
   const resetToken = crypto.randomBytes(32).toString("hex");
 
   // 2) create hash token to be saved in DB
