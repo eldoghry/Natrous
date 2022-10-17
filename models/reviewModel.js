@@ -30,7 +30,9 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// TODO: prevent duplicated review for same tour
+// prevent duplicated review for same tour
+// create unique index for (tour, user) togather
+reviewSchema.index({ user: 1, tour: 1 }, { unique: true });
 
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
