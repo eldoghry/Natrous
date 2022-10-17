@@ -28,6 +28,8 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// TODO: prevent duplicated review for same tour
+
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: "user",

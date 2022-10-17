@@ -19,6 +19,7 @@ export const getAllReviews = factory.getAll(Review);
 export const getReview = factory.getOne(Review);
 
 //admin and authorized user can delete review
+// TODO: re calc avg review rating when delete review
 export const deleteReview = catchAsync(async (req, res, next) => {
   const review = await Review.findById(req.params.id);
 
@@ -33,7 +34,9 @@ export const deleteReview = catchAsync(async (req, res, next) => {
 
   res.status(204).send("deleted");
 });
+
 //admin and authorized user can update review
+// TODO: re calc avg review rating when update review rating
 export const updateReview = catchAsync(async (req, res, next) => {
   const review =
     req.user.role === "admin"
@@ -59,3 +62,4 @@ export const updateReview = catchAsync(async (req, res, next) => {
 
   res.status(200).json({ status: "success", review });
 });
+

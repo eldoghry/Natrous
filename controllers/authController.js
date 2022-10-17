@@ -205,7 +205,6 @@ export const updateMe = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: "success", user });
 });
 
-// TODO: updatemypassword
 export const updateMyPassword = catchAsync(async (req, res, next) => {
   //1) get & check current password
   const { currentPassword, password, passwordConfirm } = req.body;

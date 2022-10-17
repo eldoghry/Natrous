@@ -1,6 +1,7 @@
 import { query } from "express";
 import mongoose from "mongoose";
 import slugify from "slugify";
+import AppError from "./../utils/AppError.js";
 
 const tourSchema = new mongoose.Schema(
   {
@@ -49,9 +50,20 @@ const tourSchema = new mongoose.Schema(
       required: [true, "A tour must have a price"],
     },
 
-    discount: {
-      type: Number,
-    },
+    // TODO: make sure discount not exceed tour price
+    // discount: {
+    //   type: Number,
+    //   validate: {
+    //     // work in creating new doc only
+    //     validator: function (val) {
+    //       console.log(val, this.price);
+    //       return this.price > val;
+    //     },
+    //     message: "Discount must be less than a Tour price",
+    //   },
+    // },
+
+    discount: Number,
 
     imageCover: {
       type: String,
@@ -110,6 +122,11 @@ const tourSchema = new mongoose.Schema(
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+// tourSchema.pre("validate",function (val) {
+//   console.log(this);
+//   return this.price > val;
+// });
 
 //Model Middleware: create auto slug for document in creation
 tourSchema.pre("save", function (next) {

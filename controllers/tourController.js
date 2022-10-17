@@ -74,3 +74,6 @@ export const getMonthlyPlan = catchAsync(async (req, res, next) => {
     stats,
   });
 });
+
+// TODO: implement distatnce geospatial tours
+// TODO: implement withen geospatial tours
