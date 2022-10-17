@@ -14,6 +14,8 @@ const router = express.Router({
 
 router.use(authController.protect);
 
+router.route("/stats").get(reviewController.test);
+
 router.route("/").get(reviewController.getAllReviews).post(
   checkBody,
 

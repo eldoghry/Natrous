@@ -74,7 +74,7 @@ const tourSchema = new mongoose.Schema(
 
     ratingsAverage: {
       type: Number,
-      default: 4.9,
+      default: 5,
       min: [1, "Tour rating must be between [1,5]"],
       max: [5, "Tour rating must be between [1,5]"],
     },
@@ -161,7 +161,7 @@ tourSchema.pre(/^find/, function (next) {
 
   this.populate({
     path: "reviews",
-    select: "review",
+    select: "review rating",
   });
 
   next();
@@ -169,13 +169,13 @@ tourSchema.pre(/^find/, function (next) {
 
 //Query Middleware
 // assume that secret tours not supposed to displayed in list result
-tourSchema.pre("aggregate", function (next) {
-  //this here is query
-  // do query as I want
-  // this.find({ secretTour: { $ne: true } });
+// tourSchema.pre("aggregate", function (next) {
+//   //this here is query
+//   // do query as I want
+//   // this.find({ secretTour: { $ne: true } });
 
-  next();
-});
+//   next();
+// });
 
 // create virtual properties
 tourSchema.virtual("durationWeeks").get(function () {

@@ -63,3 +63,11 @@ export const updateReview = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: "success", review });
 });
 
+export const test = catchAsync(async (req, res, next) => {
+  const stats = await Review.aggregate([
+    {
+      $match: { tour: "5c88fa8cf4afda39709c295a" },
+    },
+  ]);
+  res.status(200).json({ status: "success", stats });
+});

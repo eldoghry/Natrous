@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import catchAsync from "../utils/catchAsync.js";
+import Tour from "./tourModel.js";
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -42,5 +44,43 @@ reviewSchema.pre(/^find/, function (next) {
 reviewSchema.methods.isUserOwnReview = function (userId) {
   return this.user.id === userId.toString();
 };
+
+// Create Static method run on model
+reviewSchema.statics.calcAvgRating = async function (tourId) {
+  // Idea: aggregate all reviews that have same tour id
+
+  //this point to model
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: "$tour",
+        nRating: { $sum: 1 }, //calc rating num
+        avgRating: { $avg: "$rating" }, //calc rating avg
+      },
+    },
+    {
+      $project: {
+        nRating: 1,
+        avgRating: {
+          $round: ["$avgRating", 1], //rounding avgRating 2.333333 2.4
+        },
+      },
+    },
+  ]);
+
+  const ratingsQuantity = stats[0].nRating;
+  const ratingsAverage = stats[0].avgRating;
+
+  // update tour
+  await Tour.findByIdAndUpdate(tourId, { ratingsQuantity, ratingsAverage });
+};
+
+// calc rating avg after saving review
+reviewSchema.post("save", function () {
+  this.constructor.calcAvgRating(this.tour);
+});
 
 export default mongoose.model("Review", reviewSchema);
