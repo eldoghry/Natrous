@@ -19,7 +19,6 @@ export const getAllReviews = factory.getAll(Review);
 export const getReview = factory.getOne(Review);
 
 //admin and authorized user can delete review
-// TODO: re calc avg review rating when delete review
 export const deleteReview = catchAsync(async (req, res, next) => {
   const review = await Review.findById(req.params.id);
 
@@ -30,13 +29,16 @@ export const deleteReview = catchAsync(async (req, res, next) => {
   if (req.user.role !== "admin" && !review.isUserOwnReview(req.user._id))
     return next(new AppError("you are not authorized to do that", 403));
 
+  const tour = review.tour;
   await review.delete();
+
+  // re calc avg review rating when delete review
+  await Review.calcAvgRating(tour);
 
   res.status(204).send("deleted");
 });
 
 //admin and authorized user can update review
-// TODO: re calc avg review rating when update review rating
 export const updateReview = catchAsync(async (req, res, next) => {
   const review =
     req.user.role === "admin"
@@ -57,17 +59,11 @@ export const updateReview = catchAsync(async (req, res, next) => {
     return next(new AppError("review not exist", 400));
   }
 
-  // if (req.user.role !== "admin" && !review.isUserOwnReview(req.user._id))
-  //   return next(new AppError("you are not authorized to do that", 403));
+  if (req.user.role !== "admin" && !review.isUserOwnReview(req.user._id))
+    return next(new AppError("you are not authorized to do that", 403));
+
+  // reCalc avg review rating when update review rating
+  await Review.calcAvgRating(review.tour);
 
   res.status(200).json({ status: "success", review });
-});
-
-export const test = catchAsync(async (req, res, next) => {
-  const stats = await Review.aggregate([
-    {
-      $match: { tour: "5c88fa8cf4afda39709c295a" },
-    },
-  ]);
-  res.status(200).json({ status: "success", stats });
 });

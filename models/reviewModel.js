@@ -47,8 +47,9 @@ reviewSchema.methods.isUserOwnReview = function (userId) {
 
 // Create Static method run on model
 reviewSchema.statics.calcAvgRating = async function (tourId) {
-  // Idea: aggregate all reviews that have same tour id
+  console.log("🚩 recalculate rating average");
 
+  // Idea: aggregate all reviews that have same tour id
   //this point to model
   const stats = await this.aggregate([
     {
@@ -71,11 +72,17 @@ reviewSchema.statics.calcAvgRating = async function (tourId) {
     },
   ]);
 
-  const ratingsQuantity = stats[0].nRating;
-  const ratingsAverage = stats[0].avgRating;
-
-  // update tour
-  await Tour.findByIdAndUpdate(tourId, { ratingsQuantity, ratingsAverage });
+  //update tour rating
+  if (stats.length > 0)
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  else
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.9,
+    });
 };
 
 // calc rating avg after saving review

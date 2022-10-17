@@ -14,8 +14,6 @@ const router = express.Router({
 
 router.use(authController.protect);
 
-router.route("/stats").get(reviewController.test);
-
 router.route("/").get(reviewController.getAllReviews).post(
   checkBody,
 
@@ -28,12 +26,13 @@ router
   .route("/:id")
   .get(reviewController.getReview)
   .delete(
+    reviewController.prepareBodyReq,
     authController.restrictTo("admin", "user"),
     reviewController.deleteReview
   )
   .patch(
     checkBody,
-
+    reviewController.prepareBodyReq,
     authController.restrictTo("admin", "user"),
     reviewController.updateReview
   );
