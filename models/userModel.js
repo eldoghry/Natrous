@@ -69,6 +69,7 @@ userSchema.pre(/^find/, function (next) {
   next();
 });
 
+// Hashing password
 userSchema.pre("save", async function (next) {
   //1) Hashing password
   //In case password are created or modified
@@ -88,6 +89,11 @@ userSchema.pre("save", function (next) {
 
   this.passwordChangedAt = Date.now() - 1000;
   next();
+});
+
+//remove password from created users response
+userSchema.post("save", function () {
+  this.password = undefined;
 });
 
 /***************** INSTANCE METHODS *****************/
@@ -110,8 +116,6 @@ userSchema.methods.changedPasswordAfter = function (jwtTimestamp) {
 };
 
 userSchema.methods.createPasswordResetToken = function () {
-  // this.passwordResetExpire(new Date(Date.now() + 10 * 60 * 1000)); //10 min from now
-
   // 1) create resetToken acting as plain password
   const resetToken = crypto.randomBytes(32).toString("hex");
 
@@ -121,7 +125,7 @@ userSchema.methods.createPasswordResetToken = function () {
   this.passwordResetToken = hash;
   this.passwordResetExpire = new Date(Date.now() + 10 * 60 * 1000); //10 min from now
 
-  console.log({ resetToken, hash });
+  // console.log({ resetToken, hash });
 
   return resetToken;
 };

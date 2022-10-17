@@ -1,7 +1,7 @@
 import Tour from "./../models/tourModel.js";
 import catchAsync from "../utils/catchAsync.js";
-import AppError from "../utils/AppError.js";
 import * as factory from "./handlerFactory.js";
+// import AppError from "../utils/AppError.js";
 // import APIFeatures from "../utils/apiFeatures.js";
 
 export const getAllTours = factory.getAll(Tour);
@@ -10,7 +10,7 @@ export const getTour = factory.getOne(Tour);
 export const deleteTour = factory.deleteOne(Tour);
 export const updateTour = factory.updateOne(Tour);
 
-//aliase middleware
+/*** aliase middleware ***/
 export const aliasTopTours = catchAsync(async (req, res, next) => {
   req.query.sort = "-ratingsAverage,price";
   req.query.limit = "5";

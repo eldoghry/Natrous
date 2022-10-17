@@ -18,6 +18,7 @@ router.route("/").get(reviewController.getAllReviews).post(
   checkBody,
 
   authController.restrictTo("user"),
+  reviewController.prepareBodyReq,
   reviewController.createReview
 );
 

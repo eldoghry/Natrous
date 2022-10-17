@@ -32,7 +32,7 @@ router
   .delete(userController.deleteUser)
   .patch(
     checkBody,
-    userController.disablePasswordChanging,
+    userController.removePasswordFieldsReq,
     userController.updateUser
   );
 
