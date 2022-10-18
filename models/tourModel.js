@@ -123,6 +123,9 @@ const tourSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+//create index for startLocation
+tourSchema.index({ startLocation: "2dsphere" });
+
 // tourSchema.pre("validate",function (val) {
 //   console.log(this);
 //   return this.price > val;

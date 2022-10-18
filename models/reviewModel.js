@@ -49,8 +49,7 @@ reviewSchema.methods.isUserOwnReview = function (userId) {
 
 // Create Static method run on model
 reviewSchema.statics.calcAvgRating = async function (tourId) {
-  console.log("🚩 recalculate rating average");
-
+  // console.log("🚩 recalculate rating average");
   // Idea: aggregate all reviews that have same tour id
   //this point to model
   const stats = await this.aggregate([

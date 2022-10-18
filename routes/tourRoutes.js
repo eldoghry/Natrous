@@ -16,6 +16,10 @@ router
 router.route("/stats").get(tourController.getStats);
 
 router
+  .route("/tours-within/:distance/center/:latlng/unit/:unit")
+  .get(tourController.getToursWithin);
+
+router
   .route("/plan")
   .get(
     authController.protect,
