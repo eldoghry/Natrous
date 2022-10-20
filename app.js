@@ -9,15 +9,23 @@ import xss from "xss-clean";
 import hpp from "hpp";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
+import viewRoutes from "./routes/viewRoutes.js";
 import tourRoutes from "./routes/tourRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import path from "path";
 
 dotenv.config();
 
 const app = express();
 
-/**** GENERAL MIDDLEWAERS ****/
+/************* GENERAL MIDDLEWAERS *************/
+
+//  load the template engine module in your express app
+app.set("view engine", "pug");
+
+// serving static files
+app.use(express.static(path.join(process.cwd(), "public")));
 
 //Set security HTTP headers
 app.use(helmet());
@@ -67,6 +75,11 @@ app.use(
 //TEST MIDDLEWARE
 app.use(addRequestTime);
 
+/************* ROUTES *************/
+//VIEW ROUTES
+app.get("/", viewRoutes);
+
+// API ROUTES
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/tours", tourRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
@@ -75,8 +88,8 @@ app.use("/api/v1/reviews", reviewRoutes);
 app.all("*", (req, res, next) => {
   next(new AppError(`${req.originalUrl} is invalid url!!`, 404));
 });
-//
-//HANDLING EXPRESS APP ERROR RESPONSE
+
+// GLOBAL HANDLING EXPRESS APP ERROR RESPONSE
 app.use(globalErrorHandler);
 
 export default app;
