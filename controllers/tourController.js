@@ -76,9 +76,6 @@ export const getMonthlyPlan = catchAsync(async (req, res, next) => {
   });
 });
 
-// TODO: implement distatnce geospatial tours
-
-// TODO: implement withen geospatial tours
 // /tours-within/:distance/center/:latlng/unite/:unit
 // /tours-within/230/center/70.2,95.3/unite/km
 export const getToursWithin = catchAsync(async (req, res, next) => {
@@ -87,7 +84,7 @@ export const getToursWithin = catchAsync(async (req, res, next) => {
   if (!distance || !latlng || !unit)
     return next(
       new AppError(
-        "PLease make sure request /tours-within/:distance/center/:latlng/unite/:unit",
+        "PLease make sure request follow /tours-within/:distance/center/:latlng/unite/:unit",
         400
       )
     );
@@ -95,7 +92,7 @@ export const getToursWithin = catchAsync(async (req, res, next) => {
   const [lat, lng] = latlng.split(",");
 
   const radius = unit === "km" ? distance / 6378.1 : distance / 3963.2;
-  console.log(radius);
+
   const tours = await Tour.find({
     startLocation: {
       $geoWithin: { $centerSphere: [[lng * 1, lat * 1], radius] },
@@ -109,3 +106,42 @@ export const getToursWithin = catchAsync(async (req, res, next) => {
     tours,
   });
 });
+
+// /tours/distance/:latlng/unit/:unit
+export const getDistance = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+
+  if (!latlng || !unit)
+    return next(
+      new AppError(
+        "PLease make sure request follow /tours/distance/:latlng/unit/:unit",
+        400
+      )
+    );
+
+  const [lat, lng] = latlng.split(",");
+  const multiplier = unit === "mi" ? 0.000621371 : 0.001;
+
+  const tours = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: { type: "Point", coordinates: [lng * 1, lat * 1] },
+        distanceField: "distance",
+        distanceMultiplier: multiplier,
+        // spherical: true,
+      },
+    },
+    {
+      $project: { name: 1, distance: 1 },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    requestTime: req.requestTime,
+    result: tours.length,
+    tours,
+  });
+});
+
+// implement distatnce geospatial tours

@@ -32,7 +32,6 @@ const deleteData = async () => {
 };
 
 //IMPORT TOURS FROM JSON FILE
-// TODO: importing all data
 const importData = async () => {
   try {
     const tours = JSON.parse(
