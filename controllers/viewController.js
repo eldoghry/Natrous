@@ -29,3 +29,9 @@ export const getTour = catchAsync(async (req, res) => {
       tour,
     });
 });
+
+export const login = (req, res) => {
+  res.status(200).render(path.join(process.cwd(), "views", "login.pug"), {
+    title: "Login",
+  });
+};
