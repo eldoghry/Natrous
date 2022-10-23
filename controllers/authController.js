@@ -68,6 +68,38 @@ export const protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+// used in renders only, no errors
+export const isLoggedIn = async (req, res, next) => {
+  // 1) check if token in cookies
+  if (req.cookies.jwt) {
+    // 2) Validate Token
+    const token = req.cookies.jwt;
+    try {
+      const decoded = await promisify(jwt.verify)(
+        token,
+        process.env.JWT_SECRET
+      );
+
+      // 3) check user existance
+      const currentUser = await User.findOne({ _id: decoded.id });
+
+      if (!currentUser) return next();
+
+      //4) check if token time older than changing password time
+      if (currentUser.changedPasswordAfter(decoded.iat)) return next();
+
+      // user accessible in templates rendered with res.render
+      res.locals.user = currentUser;
+      req.user = currentUser;
+      return next();
+    } catch (error) {
+      console.log("some thing error");
+      return next();
+    }
+  }
+  next();
+};
+
 //Authorize MIDDLEWARE
 export const restrictTo = (...roles) => {
   return (req, _res, next) => {

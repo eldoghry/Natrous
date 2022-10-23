@@ -15,6 +15,7 @@ import userRoutes from "./routes/userRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import path from "path";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ if (process.env.NODE_ENV === "development") {
 // EXPRESS BODY PARSER
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // parse cookie in req
 
 //LIMIT EXPRESS RATE FROM SINGLE IP
 const apiLimiter = rateLimit({
