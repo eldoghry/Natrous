@@ -1,8 +1,5 @@
-console.log("alert script");
-
 //type: success| error
 const showAlert = (type, msg) => {
-  //hide old alerts
   hideAlert();
 
   // 1) create alert elemement

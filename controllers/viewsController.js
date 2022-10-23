@@ -35,3 +35,13 @@ export const login = (req, res) => {
     title: "Login",
   });
 };
+
+export const logout = (req, res) => {
+  // reset cookies with mallformed token to make sure user is logged out
+  res.cookie("jwt", null, {
+    expires: new Date(Date.now() + 1000),
+    httpOnly: true, //accessible only by the web server.
+  });
+
+  res.status(200).json({ status: "success" });
+};

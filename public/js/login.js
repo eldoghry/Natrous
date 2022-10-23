@@ -1,4 +1,5 @@
 const loginForm = document.forms.loginForm;
+const logoutBtn = document.getElementById("logout");
 
 const handleLogin = async function (e) {
   e.preventDefault();
@@ -17,8 +18,24 @@ const handleLogin = async function (e) {
     }
   } catch (error) {
     showAlert("error", error.response.data.message);
-    console.log(error);
   }
 };
 
-loginForm.addEventListener("submit", handleLogin.bind(loginForm));
+const handleLogout = async function () {
+  console.log("logout");
+  try {
+    const res = await axios.get("http://localhost:3000/logout");
+
+    console.log(res);
+
+    if (res.data.status === "success") {
+      window.location.reload(true); //hard reload
+    }
+  } catch (error) {
+    showAlert("error", error.response.data.message);
+  }
+};
+
+loginForm && loginForm.addEventListener("submit", handleLogin.bind(loginForm));
+
+logoutBtn && logoutBtn.addEventListener("click", handleLogout);
