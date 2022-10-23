@@ -12,6 +12,22 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+const createSendToken = (user, status, req, res) => {
+  const token = signToken(user._id);
+
+  user.password = undefined; //hide password from response
+
+  // add cookie to res
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true, //accessible only by the web server.
+  });
+
+  res.status(status).json({ status: "success", token, data: user });
+};
+
 const filterObj = (obj, ...excluded) => {
   const filteredObj = {};
 
@@ -74,11 +90,9 @@ export const signup = catchAsync(async (req, res, next) => {
 
   //TESTING
   // const user = await User.create(req.body);
-  user.password = undefined; //hide password from response
+  // user.password = undefined; //hide password from response
 
-  const token = signToken(user._id);
-
-  res.status(200).json({ status: "success", token, data: { user } });
+  createSendToken(user, 201, req, res);
 });
 
 export const login = catchAsync(async (req, res, next) => {
@@ -92,10 +106,8 @@ export const login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.isCorrectPassword(password)))
     return next(new AppError("Invalid credentials", 401));
 
-  //generate token
-  const token = signToken(user._id);
-
-  res.status(202).json({ status: "success", token });
+  //generate send token
+  createSendToken(user, 202, req, res);
 });
 
 export const forgetPassword = catchAsync(async (req, res, next) => {

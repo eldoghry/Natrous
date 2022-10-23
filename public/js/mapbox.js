@@ -43,7 +43,7 @@ const displayPopups = (locations) => {
 
   //3) map fit based on bound obj
   map.fitBounds(bounds, {
-    padding: { top: 20, bottom: 20, left: 100, right: 100 },
+    padding: { top: 150, bottom: 150, left: 100, right: 100 },
   });
 };
 

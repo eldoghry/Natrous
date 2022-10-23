@@ -11,9 +11,11 @@ header.header
         img(src="/img/logo-white.png" alt="Natours logo" )
 
     nav.nav.nav--user
-        //- a(href="#" class="nav__el") My bookings
-        //- a(href="#" class="nav__el") 
-        //-     img(src="img/users/user-1.jpg" alt="User photo" class="nav__user-img" )
-        //-     span Mohamed
-        a.nav__el(href="/login") Log in
-        a.nav__el.nav__el--cta(href="/#") Sign up
+        if user 
+            a(href="#" class="nav__el") My bookings
+            a(href="#" class="nav__el") 
+                img(src="img/users/user-1.jpg" alt="User photo" class="nav__user-img" )
+                span Mohamed
+        else 
+            a.nav__el(href="/login") Log in
+            a.nav__el.nav__el--cta(href="/#") Sign up

@@ -9,7 +9,7 @@ import xss from "xss-clean";
 import hpp from "hpp";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
-import viewRoutes from "./routes/viewRoutes.js";
+import viewsRoutes from "./routes/viewsRoutes.js";
 import tourRoutes from "./routes/tourRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
@@ -93,7 +93,7 @@ app.use(addRequestTime);
 
 /************* ROUTES *************/
 //VIEW ROUTES
-app.use("/", viewRoutes);
+app.use("/", viewsRoutes);
 
 // API ROUTES
 app.use("/api/v1/users", userRoutes);
