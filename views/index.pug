@@ -7,7 +7,6 @@ mixin cardData(icon, value)
             span=value
 
 block content 
-    include _header
     .main
         .card-container
             each tour in tours
@@ -44,7 +43,7 @@ block content
                             |
                             span.card__footer-text rating (#{tour.ratingsQuantity})
 
-                        a(href=`/tour/${tour.id}` class="btn btn--green btn--small") Details
+                        a(href=`/tour/${tour.slug}` class="btn btn--green btn--small") Details
 
 
 

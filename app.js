@@ -14,6 +14,7 @@ import tourRoutes from "./routes/tourRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import path from "path";
+import cors from "cors";
 
 dotenv.config();
 
@@ -27,8 +28,23 @@ app.set("view engine", "pug");
 // serving static files
 app.use(express.static(path.join(process.cwd(), "public")));
 
+app.use(cors());
+
 //Set security HTTP headers
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: {
+      allowOrigins: ["*"],
+    },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["*"],
+        scriptSrc: ["* data: 'unsafe-eval' 'unsafe-inline' blob:"],
+      },
+    },
+  })
+);
 
 // Development Logging
 if (process.env.NODE_ENV === "development") {
@@ -77,7 +93,7 @@ app.use(addRequestTime);
 
 /************* ROUTES *************/
 //VIEW ROUTES
-app.get("/", viewRoutes);
+app.use("/", viewRoutes);
 
 // API ROUTES
 app.use("/api/v1/users", userRoutes);
@@ -86,7 +102,7 @@ app.use("/api/v1/reviews", reviewRoutes);
 
 // HANDLING UNKOWEN ROUTES
 app.all("*", (req, res, next) => {
-  next(new AppError(`${req.originalUrl} is invalid url!!`, 404));
+  next(new AppError(`INVALID URL!! ${req.originalUrl}`, 404));
 });
 
 // GLOBAL HANDLING EXPRESS APP ERROR RESPONSE
