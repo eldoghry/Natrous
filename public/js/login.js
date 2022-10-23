@@ -1,6 +1,4 @@
-console.log("login script");
 const loginForm = document.forms.loginForm;
-// const loginForm = document.getElementById("loginForm");
 
 const handleLogin = async function (e) {
   e.preventDefault();
@@ -14,9 +12,11 @@ const handleLogin = async function (e) {
     });
 
     if (res.data.status === "success") {
+      showAlert("success", "Login Successfuly");
       window.setTimeout(() => window.location.assign("/"), 1500);
     }
   } catch (error) {
+    showAlert("error", error.response.data.message);
     console.log(error);
   }
 };
