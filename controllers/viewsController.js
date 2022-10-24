@@ -36,8 +36,10 @@ export const login = (req, res) => {
   });
 };
 
-export const logout = (req, res) => {
-  // reset cookies with mallformed token to make sure user is logged out
+export const logout = (_, res) => {
+  // add invalid jwt token to cookie
+  // to make sure user is logout
+
   res.cookie("jwt", null, {
     expires: new Date(Date.now() + 1000),
     httpOnly: true, //accessible only by the web server.

@@ -21,7 +21,7 @@ mixin overviewBoxDetail(icon, label, text)
 
 block content 
 
-    section.section-header(style={'background': `url('/img/tours/${tour.imageCover}') center/cover`})
+    section.section-header(style={'background': `linear-gradient( to bottom right, rgba(125, 213, 111, 0.85), rgba(40, 180, 135, 0.85) ), url('/img/tours/${tour.imageCover}') center/cover`})
         .heading-box
             h1.heading-primary: span #{tour.name}
             .heading-box__group
