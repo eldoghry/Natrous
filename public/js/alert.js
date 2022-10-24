@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 //type: success| error
 const showAlert = (type, msg) => {
   //hide old alerts

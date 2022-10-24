@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const mapbox = document.getElementById("map");
 const locations = JSON.parse(mapbox.dataset.locations);
 

@@ -1,6 +1,7 @@
+/* eslint-disable */
+
 const loginForm = document.forms["loginForm"];
 const logoutBtn = document.getElementById("logout");
-
 
 async function handleLogin(e) {
   e.preventDefault();
