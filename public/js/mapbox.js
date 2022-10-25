@@ -1,9 +1,6 @@
 /* eslint-disable */
 
-const mapbox = document.getElementById("map");
-const locations = JSON.parse(mapbox.dataset.locations);
-
-const displayPopups = (locations) => {
+export const displayMap = (locations) => {
   if (!locations.length) return;
 
   //   1) create map
@@ -48,5 +45,3 @@ const displayPopups = (locations) => {
     padding: { top: 150, bottom: 150, left: 100, right: 100 },
   });
 };
-
-displayPopups(locations);

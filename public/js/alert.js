@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 //type: success| error
-const showAlert = (type, msg) => {
+export const showAlert = (type, msg) => {
   //hide old alerts
   hideAlert();
 
@@ -16,7 +16,7 @@ const showAlert = (type, msg) => {
   }, 1500);
 };
 
-const hideAlert = () => {
+export const hideAlert = () => {
   const el = document.querySelector(".alert");
   el && el.parentNode.removeChild(el);
 };

@@ -3,12 +3,14 @@
   "name": "natrous",
   "version": "1.0.0",
   "description": "",
-  "main": "./public/js/main.js",
+  "main": "./public/js/bundle.js",
   "scripts": {
     "start": "SET NODE_ENV=development& nodemon ./server.js",
     "start:prod": "SET NODE_ENV=production& nodemon ./server.js",
-    "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js ",
-    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js"
+    "Xwatch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
+    "Xbuild:js": "parcel build ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
+    "watch:js": "parcel watch ./public/js/index.js",
+    "build:js": "parcel build ./public/js/index.js"
   },
   "author": "mohammed magdy",
   "license": "ISC",

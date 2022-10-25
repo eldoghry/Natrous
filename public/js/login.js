@@ -1,9 +1,8 @@
 /* eslint-disable */
+import { showAlert } from "./alert.js";
+// import axios from "axios";
 
-const loginForm = document.forms["loginForm"];
-const logoutBtn = document.getElementById("logout");
-
-async function handleLogin(e) {
+export const handleLogin = async function (e) {
   e.preventDefault();
   try {
     const email = this.elements.email.value;
@@ -21,12 +20,10 @@ async function handleLogin(e) {
   } catch (error) {
     showAlert("error", error.response.data.message);
   }
-}
+};
 
-const handleLogout = async () => {
+export const handleLogout = async () => {
   try {
-    console.log("logout");
-
     const res = await axios.get("http://localhost:3000/logout");
 
     if (res.data.status === "success") window.location.reload(true); // hard reload
@@ -35,7 +32,3 @@ const handleLogout = async () => {
     showAlert("error", error.response.data.message);
   }
 };
-
-loginForm && loginForm.addEventListener("submit", handleLogin.bind(loginForm));
-
-logoutBtn && logoutBtn.addEventListener("click", handleLogout);

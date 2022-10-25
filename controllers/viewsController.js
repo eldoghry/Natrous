@@ -1,8 +1,9 @@
-import catchAsync from "../utils/catchAsync.js";
-// import AppError from "../utils/AppError.js";
-// import * as factory from "./handlerFactory.js";
 import path from "path";
+import catchAsync from "../utils/catchAsync.js";
 import Tour from "../models/tourModel.js";
+// import AppError from "../utils/AppError";
+// eslint-disable-next-line prettier/prettier
+// import * as factory from "./handlerFactory";
 
 export const getOverview = catchAsync(async (req, res) => {
   const tours = await Tour.find();
