@@ -10,5 +10,6 @@ router.get("/", viewsController.getOverview);
 router.get("/tour/:slug", viewsController.getTour);
 router.get("/login", viewsController.login);
 router.get("/logout", viewsController.logout);
+router.get("/me", viewsController.getProfile);
 
 export default router;

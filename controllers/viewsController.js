@@ -48,3 +48,9 @@ export const logout = (_, res) => {
 
   res.status(200).json({ status: "success" });
 };
+
+export const getProfile = (req, res) => {
+  res.status(200).render(path.join(process.cwd(), "views", "profile.pug"), {
+    title: "Login",
+  });
+};
