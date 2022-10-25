@@ -1,7 +1,17 @@
 import AppError from "../utils/AppError.js";
+import path from "path";
 
 const sendErrorResHandler = (err, req, res) => {
-  if (process.env.NODE_ENV === "development")
+  if (!req.originalUrl.startsWith("/api")) {
+    // handle client side unkown routes
+    // render template
+    return res
+      .status(err.statusCode)
+      .render(path.join(process.cwd(), "views", "error.pug"), {
+        title: "Natrous",
+        message: err.message,
+      });
+  } else if (process.env.NODE_ENV === "development")
     return res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
@@ -12,8 +22,6 @@ const sendErrorResHandler = (err, req, res) => {
     return res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
-      //   error: err,
-      //   stack: err.stack,
     });
   }
 };
@@ -42,8 +50,6 @@ const handleJWTExpireErr = () =>
 
 // GLOBAL ERROR HANDLER
 export default (err, req, res, next) => {
-  //   console.log(err);
-
   err.status = err.status || "error";
   err.statusCode = err.statusCode || 500;
 
